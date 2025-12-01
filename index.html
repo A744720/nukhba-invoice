@@ -209,11 +209,11 @@ const customer = decodeURIComponent(p.Customer || "");
     metaBlock.innerHTML = 
       <div class="meta-row">
         <span class="meta-label">اسم المراجع:</span>
-        <span>${customer || "-"}</span>
+        <span>${Customer || "-"}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">رقم الوصل:</span>
-        <span>${invoiceNo || "-"}</span>
+        <span>${InvoiceNo || "-"}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">التاريخ:</span>
@@ -282,3 +282,4 @@ const customer = decodeURIComponent(p.Customer || "");
   </script>
 </body>
 </html>
+
