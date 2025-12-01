@@ -4,81 +4,70 @@
   <meta charset="UTF-8" />
   <title>فاتورة - عيادات النخبة الطبية</title>
   <style>
-    /* حجم الورقة A5 للطباعة */
-    @page {
-      size: A5 portrait;
-      margin: 10mm;
+    * {
+      box-sizing: border-box;
+      font-family: "Tahoma", Arial, sans-serif;
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
+      background: #f0f0f0;
       margin: 0;
       padding: 0;
+      display: flex;
+      justify-content: center;
     }
 
     .invoice-wrapper {
-      max-width: 420px;          /* قريب من عرض A5 */
-      margin: 10px auto;
-      background: #ffffff;
-      padding: 16px 18px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.12);
-      border-radius: 8px;
-      box-sizing: border-box;
+      width: 100%;
+      max-width: 600px;
+      margin: 10mm auto;
+      background: white;
+      padding: 10mm;
+      border: 1px solid #ccc;
     }
 
-    .clinic-name {
-      font-size: 18px;
-      font-weight: 700;
+    h1, h2, h3, h4, h5 {
+      margin: 0;
       text-align: center;
-      margin-bottom: 4px;
+    }
+
+    .clinic-title {
+      font-size: 18px;
+      font-weight: bold;
     }
 
     .clinic-info {
       font-size: 11px;
       text-align: center;
-      margin-bottom: 10px;
-      color: #555;
-    }
-
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin: 10px 0 4px;
+      margin-bottom: 8px;
     }
 
     .meta {
       font-size: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .meta span {
-      display: block;
-      margin-bottom: 2px;
+      display: inline-block;
+      min-width: 80px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 8px;
       font-size: 12px;
-      margin-top: 6px;
     }
 
     th, td {
-      border: 1px solid #ccc;
-      padding: 4px 6px;
+      border: 1px solid #000;
+      padding: 4px;
       text-align: center;
-      vertical-align: middle;
     }
 
     th {
-      background: #f0f0f0;
-      font-weight: 600;
-    }
-
-    tfoot td {
-      font-weight: 700;
-      background: #fafafa;
+      background: #eee;
+      font-weight: bold;
     }
 
     .notes {
@@ -86,162 +75,145 @@
       margin-top: 8px;
     }
 
-    .print-btn {
-      margin-top: 10px;
-      text-align: center;
+    .notes-label {
+      font-weight: bold;
     }
 
-    .print-btn button {
+    .total-row td {
+      font-weight: bold;
+      background: #f7f7f7;
+    }
+
+    .print-btn {
+      margin-top: 10px;
+      display: inline-block;
       padding: 6px 14px;
       font-size: 12px;
-      border-radius: 6px;
-      border: none;
+      border: 1px solid #000;
+      background: #fff;
       cursor: pointer;
     }
 
     @media print {
       body {
-        background: #fff;
+        background: white;
+      }
+      .invoice-wrapper {
+        border: none;
+        margin: 0;
+        padding: 8mm;
       }
       .print-btn {
         display: none;
       }
-      .invoice-wrapper {
-        box-shadow: none;
-        margin: 0;
-        border-radius: 0;
-      }
+    }
+
+    @page {
+      size: A5 portrait;
+      margin: 8mm;
     }
   </style>
 </head>
 <body>
   <div class="invoice-wrapper">
-    <div class="clinic-name">عيادات النخبة الطبية</div>
+    <h2 class="clinic-title">عيادات النخبة الطبية</h2>
     <div class="clinic-info">
-      العراق / ميسان / العمارة / شارع التانكي<br>
+      العراق / ميسان / العمارة / شارع التانكي<br />
       هاتف: 07706617872
     </div>
 
     <div class="meta">
-      <span id="customer">اسم المراجع: -</span>
-      <span id="invoiceNo">رقم الوصل: -</span>
-      <span id="dateTime">التاريخ: -</span>
+      <div><span>اسم المراجع:</span> <span id="customer-name"></span></div>
+      <div><span>رقم الوصل:</span> <span id="invoice-no"></span></div>
+      <div><span>التاريخ:</span> <span id="invoice-date"></span></div>
     </div>
 
-    <div class="section-title">فاتورة تجميلية</div>
+    <h3 style="text-align:center; margin: 6px 0;">فاتورة تجميلية</h3>
 
     <table>
       <thead>
         <tr>
-          <th style="width:30px">#</th>
+          <th>#</th>
           <th>الخدمة</th>
-          <th style="width:60px">العدد</th>
-          <th style="width:80px">سعر الوحدة</th>
-          <th style="width:80px">الإجمالي</th>
+          <th>العدد</th>
+          <th>سعر الوحدة</th>
+          <th>الإجمالي</th>
         </tr>
       </thead>
-      <tbody id="linesBody">
-        <!-- يملأ بالـ JS -->
+      <tbody id="lines-body">
       </tbody>
       <tfoot>
-        <tr>
+        <tr class="total-row">
           <td colspan="4">المجموع الكلي</td>
-          <td id="totalCell">0</td>
+          <td id="grand-total"></td>
         </tr>
       </tfoot>
     </table>
 
-    <div class="notes" id="notesBox" style="display:none;">
-      <strong>الملاحظات:</strong>
-      <span id="notesText"></span>
+    <div class="notes">
+      <span class="notes-label">ملاحظات:</span>
+      <span id="notes-text"></span>
     </div>
 
-    <div class="print-btn">
-      <button onclick="window.print()">طباعة</button>
-    </div>
+    <button class="print-btn" onclick="window.print()">طباعة</button>
   </div>
 
   <script>
-    // قراءة الباراميترات من الرابط
     const params = new URLSearchParams(window.location.search);
 
     function getParam(name, def = "") {
-      const v = params.get(name);
-      return v ? decodeURIComponent(v) : def;
+      return params.get(name) || def;
     }
 
-    function parseList(name) {
-      const raw = getParam(name, "");
-      if (!raw) return [];
-      // AppSheet TEXT(list) => "a, b, c"
-      return raw.split(",").map(v => v.trim()).filter(v => v.length > 0);
+    // تعبئة بيانات الهيدر
+    document.getElementById("customer-name").textContent = getParam("Customer");
+    document.getElementById("invoice-no").textContent = getParam("InvoiceNo");
+    document.getElementById("invoice-date").textContent = getParam("DateTime");
+    document.getElementById("notes-text").textContent = getParam("Notes");
+
+    const linesText = getParam("Lines", "").trim();
+    const totalFromApp = Number(getParam("Total", "0"));
+    const body = document.getElementById("lines-body");
+
+    let grandTotal = 0;
+
+    if (linesText) {
+      // TEXT(list) في AppSheet يرجع "سطر1, سطر2, سطر3..."
+      const lineParts = linesText.split(",");
+
+      lineParts.forEach((part, index) => {
+        const cleaned = part.trim();
+        if (!cleaned) return;
+        // كل سطر بالشكل: Qty|Name|UnitPrice|LineTotal
+        const pieces = cleaned.split("|");
+        const qty = (pieces[0] || "").trim();
+        const name = (pieces[1] || "").trim();
+        const unitPrice = (pieces[2] || "").trim();
+        const lineTotal = (pieces[3] || "").trim();
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = 
+          <td>${index + 1}</td>
+          <td>${name}</td>
+          <td>${qty}</td>
+          <td>${unitPrice}</td>
+          <td>${lineTotal}</td>
+        ;
+        body.appendChild(tr);
+
+        const num = Number(lineTotal.replace(/,/g, ""));
+        if (!isNaN(num)) {
+          grandTotal += num;
+        }
+      });
     }
 
-    // تعبئة البيانات الأساسية
-    document.getElementById("customer").textContent =
-      "اسم المراجع: " + (getParam("Customer") || "-");
-
-    document.getElementById("invoiceNo").textContent =
-      "رقم الوصل: " + (getParam("InvoiceNo") || "-");
-
-    document.getElementById("dateTime").textContent =
-      "التاريخ: " + (getParam("DateTime") || "-");
-// الملاحظات
-    const notes = getParam("Notes");
-    if (notes && notes.trim().length > 0) {
-      document.getElementById("notesText").textContent = notes;
-      document.getElementById("notesBox").style.display = "block";
+    // إذا ما قدر يحسب من الأسطر، يستخدم المجموع الجاي من AppSheet
+    if (!grandTotal && totalFromApp) {
+      grandTotal = totalFromApp;
     }
 
-    // قراءة القوائم من الرابط
-    const qtyList        = parseList("Qty");
-    const serviceList    = parseList("Service");
-    const unitPriceList  = parseList("UnitPrice");
-    const lineTotalList  = parseList("LineTotal");
-
-    const tbody = document.getElementById("linesBody");
-
-    const maxLen = Math.max(
-      qtyList.length,
-      serviceList.length,
-      unitPriceList.length,
-      lineTotalList.length
-    );
-
-    for (let i = 0; i < maxLen; i++) {
-      const tr = document.createElement("tr");
-
-      const cIndex = document.createElement("td");
-      cIndex.textContent = i + 1;
-      tr.appendChild(cIndex);
-
-      const cService = document.createElement("td");
-      cService.textContent = serviceList[i] || "";
-      tr.appendChild(cService);
-
-      const cQty = document.createElement("td");
-      cQty.textContent = qtyList[i] || "";
-      tr.appendChild(cQty);
-
-      const cUnit = document.createElement("td");
-      cUnit.textContent = unitPriceList[i] || "";
-      tr.appendChild(cUnit);
-
-      const cTotal = document.createElement("td");
-      cTotal.textContent = lineTotalList[i] || "";
-      tr.appendChild(cTotal);
-
-      tbody.appendChild(tr);
-    }
-
-    // مجموع الفاتورة
-    const total = getParam("Total") || "0";
-    document.getElementById("totalCell").textContent = total;
-
-    // طباعة تلقائية عند الفتح (اختياري)
-    window.addEventListener("load", () => {
-      window.print();
-    });
+    document.getElementById("grand-total").textContent = grandTotal.toLocaleString("en-US");
   </script>
 </body>
 </html>
