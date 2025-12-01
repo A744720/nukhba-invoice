@@ -171,49 +171,14 @@
     document.getElementById("invoice-date").textContent = getParam("DateTime");
     document.getElementById("notes-text").textContent = getParam("Notes");
 
-    const linesText = getParam("Lines", "").trim();
+    // الأسطر جاهزة كـ HTML من AppSheet
+    const linesHtml = getParam("Lines", "");
+    document.getElementById("lines-body").innerHTML = linesHtml || "";
+
+    // المجموع الكلي من AppSheet
     const totalFromApp = Number(getParam("Total", "0"));
-    const body = document.getElementById("lines-body");
-
-    let grandTotal = 0;
-
-    if (linesText) {
-      // TEXT(list) في AppSheet يرجع "سطر1, سطر2, سطر3..."
-      const lineParts = linesText.split(",");
-
-      lineParts.forEach((part, index) => {
-        const cleaned = part.trim();
-        if (!cleaned) return;
-        // كل سطر بالشكل: Qty|Name|UnitPrice|LineTotal
-        const pieces = cleaned.split("|");
-        const qty = (pieces[0] || "").trim();
-        const name = (pieces[1] || "").trim();
-        const unitPrice = (pieces[2] || "").trim();
-        const lineTotal = (pieces[3] || "").trim();
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = 
-          <td>${index + 1}</td>
-          <td>${name}</td>
-          <td>${qty}</td>
-          <td>${unitPrice}</td>
-          <td>${lineTotal}</td>
-        ;
-        body.appendChild(tr);
-
-        const num = Number(lineTotal.replace(/,/g, ""));
-        if (!isNaN(num)) {
-          grandTotal += num;
-        }
-      });
-    }
-
-    // إذا ما قدر يحسب من الأسطر، يستخدم المجموع الجاي من AppSheet
-    if (!grandTotal && totalFromApp) {
-      grandTotal = totalFromApp;
-    }
-
-    document.getElementById("grand-total").textContent = grandTotal.toLocaleString("en-US");
+    document.getElementById("grand-total").textContent =
+      totalFromApp.toLocaleString("en-US");
   </script>
 </body>
 </html>
