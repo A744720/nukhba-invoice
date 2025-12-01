@@ -4,55 +4,92 @@
   <meta charset="UTF-8" />
   <title>فاتورة عيادات النخبة الطبية</title>
   <style>
+    /* حجم الورقة عند الطباعة A5 */
+    @page {
+      size: A5 portrait;
+      margin: 8mm;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        background: #fff;
+      }
+      .invoice {
+        box-shadow: none;
+        margin: 0;
+        width: auto;
+      }
+    }
+
     body {
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       background: #f5f5f5;
     }
+
     .invoice {
-      max-width: 800px;
+      max-width: 580px; /* مناسب لـ A5 */
       margin: 0 auto;
       background: #fff;
-      padding: 24px 32px;
+      padding: 18px 22px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
     }
+
     h1 {
-      font-size: 20px;
+      font-size: 18px;
       margin: 0;
     }
+
     .header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 10px;
       border-bottom: 1px solid #ddd;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
     }
+
     .clinic-info {
-      font-size: 13px;
+      font-size: 11px;
       line-height: 1.4;
     }
+
     .meta {
-      font-size: 13px;
+      font-size: 11px;
       line-height: 1.6;
+      text-align: left;
     }
+
+    h2 {
+      font-size: 14px;
+      margin: 8px 0 4px;
+      text-align: center;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
-      font-size: 13px;
+      margin-top: 8px;
+      font-size: 11px;
     }
+
     th, td {
       border: 1px solid #ddd;
-      padding: 6px 8px;
+      padding: 4px 6px;
+      word-wrap: break-word;
     }
+
     th {
       background: #f0f0f0;
     }
+
     .notes {
-      margin-top: 18px;
-      font-size: 13px;
+      margin-top: 10px;
+      font-size: 11px;
     }
+
     .notes-label {
       font-weight: bold;
     }
@@ -75,16 +112,16 @@
       </div>
     </div>
 
-    <h2 style="font-size: 16px; margin: 8px 0 4px;">فاتورة تجميلية</h2>
+    <h2>فاتورة تجميلية</h2>
 
     <table>
       <thead>
         <tr>
-          <th style="width:40px;">#</th>
+          <th style="width:30px;">#</th>
           <th>الخدمة</th>
-          <th style="width:70px;">العدد</th>
-          <th style="width:90px;">سعر الوحدة</th>
-          <th style="width:90px;">الإجمالي</th>
+          <th style="width:55px;">العدد</th>
+          <th style="width:75px;">سعر الوحدة</th>
+          <th style="width:75px;">الإجمالي</th>
         </tr>
       </thead>
       <tbody id="lines-body"></tbody>
@@ -99,7 +136,7 @@
   <script>
     const params = new URLSearchParams(window.location.search);
 
-    // نقرأ البراميترات بنفس الأسماء بالضبط من الرابط (بحرف كبير)
+    // نقرأ البراميترات بنفس الأسماء اللي من AppSheet (حروف كبيرة)
     const customer = params.get("Customer") || "";
     const invoiceNo = params.get("InvoiceNo") || "";
     const dateTime = params.get("DateTime") || "";
@@ -114,24 +151,36 @@
     const tbody = document.getElementById("lines-body");
 
     if (linesParam) {
-      // AppSheet أصلاً مرسلها ENCODEURL، فنفك التشفير و نقسم حسب سطر جديد
+      // نفك ENCODEURL
       const decoded = decodeURIComponent(linesParam);
+
+      // نفترض أن كل سطر منفصل بسطر جديد
       const rows = decoded.split(/\n+/).filter(r => r.trim() !== "");
 
       rows.forEach((rowText, index) => {
         const tr = document.createElement("tr");
 
-        // حالياً: نخلي النص كامل في عمود "الخدمة"
-        // بعدين نقدر نفصّل الكمية والسعر إذا غيرنا فورمات LineSummary
+        // نفصل السطر حسب " | " اللي حطيناها في LineSummary
+        const parts = rowText.split("|");
+
+        const service = (parts[0] || "").trim();
+        const qty     = (parts[1] || "").trim();
+        const unit    = (parts[2] || "").trim();
+        const total   = (parts[3] || "").trim();
+
         const tdIndex = document.createElement("td");
         tdIndex.textContent = index + 1;
-
         const tdService = document.createElement("td");
-        tdService.textContent = rowText;
+        tdService.textContent = service;
 
         const tdQty = document.createElement("td");
+        tdQty.textContent = qty;
+
         const tdUnit = document.createElement("td");
+        tdUnit.textContent = unit;
+
         const tdTotal = document.createElement("td");
+        tdTotal.textContent = total;
 
         tr.append(tdIndex, tdService, tdQty, tdUnit, tdTotal);
         tbody.appendChild(tr);
